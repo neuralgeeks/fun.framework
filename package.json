@@ -1,0 +1,35 @@
+{
+  "name": "fun.framework",
+  "version": "0.1.0",
+  "description": "A fun, intuitive, expresive and elegant web application framework.",
+  "scripts": {
+    "test": "echo \"No test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neuralgeeks/fun.framework.git"
+  },
+  "author": "neuralgeeks",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/neuralgeeks/fun.framework/issues"
+  },
+  "homepage": "https://github.com/neuralgeeks/fun.framework#readme",
+  "dependencies": {
+    "auto-bind": "^4.0.0",
+    "bcrypt": "^4.0.1",
+    "cron": "^1.8.2",
+    "cron-validator": "^1.1.1",
+    "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
+    "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.1.0",
+    "ramda": "^0.27.0",
+    "random-key": "^0.3.2",
+    "sequelize": "^5.21.11",
+    "socket.io": "^2.3.0",
+    "uuid": "^8.1.0",
+    "winston": "^3.2.1"
+  }
+}

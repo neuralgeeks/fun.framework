@@ -1,0 +1,115 @@
+const Logger = require('../Logger');
+const logger = new Logger();
+
+/**
+ * Base rule representation.
+ *
+ * @since      0.1.0
+ * @access     public
+ *
+ * @constructs BaseRule
+ */
+class BaseRule {
+  /**
+   * Rule human readable name
+   *
+   * @since    0.1.0
+   * @access   public
+   *
+   * @type     {String}
+   *
+   * @member   {String} name
+   * @memberof BaseRule
+   */
+  name = 'BaseRule';
+
+  /**
+   * Parses and validates the body and evaluates the rule predicate.
+   *
+   * This method should be final
+   *
+   * @since      0.1.0
+   * @access     public
+   * @memberof   BaseRule
+   *
+   * @param      {any}      data     The data to parse the body from.
+   *
+   * @returns    {boolean}           The rule's evaluation result.
+   */
+  async eval(data) {
+    try {
+      let body = await this.body(data);
+      if (await this.debug()) {
+        logger.debug(this.name + ' body evaluation returned: ');
+        logger.debug(body);
+      }
+
+      let result = await this.predicate(body);
+      if (await this.debug())
+        logger.debug(this.name + ' evaluation returned ' + result);
+
+      return result;
+    } catch (e) {
+      if (await this.debug()) {
+        logger.debug('Exeption raised while evaluating ' + this.name);
+        logger.debug(e);
+        logger.debug(this.name + ' evaluation returned false');
+      }
+      return false;
+    }
+  }
+
+  /**
+   * Parses and validates the body of the rule from a data object.
+   *
+   * The output of this method will be used to evaluate the rule predicate.
+   * If this method throws an error, the body gets invalidated and thus the rule predicate.
+   *
+   * @since      0.1.0
+   * @access     public
+   * @memberof   BaseRule
+   *
+   * @param      {any}      data  The data to parse the body from.
+   *
+   * @throws     {any}
+   * @returns    {any}            The rules body
+   */
+  async body(data) {
+    return data;
+  }
+
+  /**
+   * Parses and validates the body of the rule from a data object.
+   *
+   * The output of this method will be used to evaluate the rule predicate.
+   * If this method throws an error, the body gets invalidated and thus the rule predicate.
+   *
+   * @since      0.1.0
+   * @access     public
+   * @memberof   BaseRule
+   *
+   * @param      {any}      data  The data to parse the body from.
+   *
+   * @returns    {boolean}         The predicate's output
+   */
+  async predicate(body) {
+    return true;
+  }
+
+  /**
+   * Returns wheter or not the rule should debug it's evaluation process.
+   *
+   * @since      0.1.0
+   * @access     public
+   * @memberof   BaseRule
+   *
+   * @param      {any}      data  The data to parse the body from.
+   *
+   * @returns    {boolean}        Wheter or not the rule should debug it's evaluation process.
+   */
+  async debug() {
+    return false;
+  }
+}
+
+module.exports = BaseRule;
