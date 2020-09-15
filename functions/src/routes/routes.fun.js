@@ -1,5 +1,6 @@
 const http = require('./http/http.fun');
 const group = require('./group.fun');
+const subgroup = require('./subgroup.fun');
 const rest = require('./rest.fun');
 const R = require('ramda');
 
@@ -43,6 +44,12 @@ const BaseController = require('../../../classes/src/BaseController');
  */
 
 /**
+ * A high order function that handles a routes subgroup, this is, a group that behaves as a route
+ * so that a group can group it within its routes.
+ * @typedef {(middleware: [Middleware]) => (routes: [Route]) => Route} Subgroup
+ */
+
+/**
  * Wraps up all fun routes related methods and high order funtions.
  *
  * @since  0.1.0
@@ -57,6 +64,7 @@ const BaseController = require('../../../classes/src/BaseController');
  *   patch: Method,
  *   delete: Method,
  *   group: Group,
+ *   subgroup: Group,
  *   rest: Rest
  * }} Routes related available methods
  */
@@ -65,6 +73,7 @@ let routes = (router, controller) => {
     http(router, controller),
     {
       group: group(router, controller),
+      subgroup: subgroup(router, controller),
       rest: rest(router, controller)
     }
   ]);
