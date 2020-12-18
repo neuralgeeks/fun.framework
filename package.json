@@ -1,6 +1,6 @@
 {
   "name": "fun.framework",
-  "version": "0.2.0",
+  "version": "0.3.0-0",
   "description": "A fun, intuitive, expresive and elegant web application framework.",
   "scripts": {
     "test": "echo \"No test specified\""
