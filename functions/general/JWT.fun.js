@@ -4,38 +4,42 @@ const fun = require('./errors.fun');
 const Errors = require('../../classes/src/errors');
 
 let httpDecodeBearerScheme = (req, res) => {
-  // ---------------------- getting the Auth -------------------- //
-  let auth = req.get('Authorization');
-  if (!auth) {
-    let reason = 'Missing authorization.';
-    fun.throw(req, res, new Errors.UnauthorizedError(reason));
-  }
-  auth = auth.trim();
-  let authSplit = auth.split(' ');
+  try {
+    // ---------------------- getting the Auth -------------------- //
+    let auth = req.get('Authorization');
+    if (!auth) {
+      let reason = 'Missing authorization.';
+      throw new Errors.UnauthorizedError(reason);
+    }
+    auth = auth.trim();
+    let authSplit = auth.split(' ');
 
-  // ------------------- validating auth scheme ----------------- //
-  let authScheme = authSplit[0];
-  if (authScheme != 'Bearer') {
-    let reason = 'Wrong auth scheme, expected Bearer. given: ' + authScheme;
-    fun.throw(req, res, new Errors.UnauthorizedError(reason));
-  }
+    // ------------------- validating auth scheme ----------------- //
+    let authScheme = authSplit[0];
+    if (authScheme != 'Bearer') {
+      let reason = 'Wrong auth scheme, expected Bearer. given: ' + authScheme;
+      throw new Errors.UnauthorizedError(reason);
+    }
 
-  // ------------------ validating the token -------------------- //
-  let token = authSplit[1];
-  if (!token) {
-    fun.throw(req, res, new Errors.JWT.MissingJWTError());
-  }
+    // ------------------ validating the token -------------------- //
+    let token = authSplit[1];
+    if (!token) {
+      throw new Errors.JWT.MissingJWTError();
+    }
 
-  // ------------------ decoding the Auth JWT ------------------- //
-  let decoded = jwt.decode(token);
-  if (!decoded) {
-    fun.throw(req, res, new Errors.JWT.BadJWTError(token));
-  }
+    // ------------------ decoding the Auth JWT ------------------- //
+    let decoded = jwt.decode(token);
+    if (!decoded) {
+      throw new Errors.JWT.BadJWTError(token);
+    }
 
-  return {
-    decoded: decoded,
-    token: token
-  };
+    return {
+      decoded: decoded,
+      token: token
+    };
+  } catch (e) {
+    fun.throw(req, res, e);
+  }
 };
 
 let httpVerifyUserToken = async (
