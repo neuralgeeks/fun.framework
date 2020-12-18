@@ -58,17 +58,17 @@ let httpVerifyUserToken = async (
   try {
     let validJWT = await source(id);
     if (!validJWT) {
-      fun.throw(req, res, new Errors.JWT.InvalidJWTError(schema.token));
+      throw new Errors.JWT.InvalidJWTError(schema.token);
     }
 
     // -------------------- verifying the JWT -------------------- //
     try {
       jwt.verify(schema.token, validJWT.secret);
     } catch {
-      fun.throw(req, res, new Errors.JWT.InvalidJWTError(schema.token));
+      throw new Errors.JWT.InvalidJWTError(schema.token);
     }
   } catch (e) {
-    fun.throw(req, res, new Errors.UnauthorizedError(e));
+    fun.throw(req, res, e);
   }
 };
 
