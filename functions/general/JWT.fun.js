@@ -68,7 +68,7 @@ let httpVerifyUserToken = async (
       fun.throw(req, res, new Errors.JWT.InvalidJWTError(schema.token));
     }
   } catch (e) {
-    fun.throw(req, res, new Errors.JWT.UnauthorizedError(e));
+    fun.throw(req, res, new Errors.UnauthorizedError(e));
   }
 };
 
