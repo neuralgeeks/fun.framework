@@ -1,3 +1,5 @@
+const autoBind = require('auto-bind');
+
 /**
  * Base repository representation.
  *
@@ -31,6 +33,7 @@ class BaseRepository {
    * @param {Model} model The model that the repository will handle.
    */
   constructor(model) {
+    autoBind(this);
     this.model = model;
   }
 
