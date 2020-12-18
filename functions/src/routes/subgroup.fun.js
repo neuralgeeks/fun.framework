@@ -27,7 +27,7 @@ let subgroup = (router, controller) => {
   return (subgroupMiddleware) => {
     return (routes) => {
       return (middlewares) => {
-        let completeMiddleware = R.append(middlewares, subgroupMiddleware);
+        let completeMiddleware = R.concat(middlewares, subgroupMiddleware);
         group(router, controller)(completeMiddleware)(routes);
       };
     };
