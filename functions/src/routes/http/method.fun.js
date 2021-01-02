@@ -5,7 +5,7 @@ const BaseValidator = require('../../../../classes/src/BaseValidator');
 const errorFun = require('../../../general/errors.fun');
 const BaseController = require('../../../../classes/src/BaseController');
 
-const InvalidHandlerUnderController = require('../../../../classes/src/errors/InvalidHandlerUnderControllerError');
+const InvalidHandlerUnderControllerError = require('../../../../classes/src/errors/InvalidHandlerUnderControllerError');
 
 /**
  * An express middleware handler function
@@ -54,7 +54,10 @@ let method = (router, controller) => {
               errorFun.throw(
                 req,
                 res,
-                new InvalidHandlerUnderController(handlerMethodName, controller)
+                new InvalidHandlerUnderControllerError(
+                  handlerMethodName,
+                  controller
+                )
               );
             }
           } catch (err) {
