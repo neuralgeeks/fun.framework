@@ -5,6 +5,8 @@ const BaseValidator = require('../../../../classes/src/BaseValidator');
 const errorFun = require('../../../general/errors.fun');
 const BaseController = require('../../../../classes/src/BaseController');
 
+const InvalidHandlerUnderController = require('../../../../classes/src/errors/InvalidHandlerUnderControllerError');
+
 /**
  * An express middleware handler function
  * @typedef {(req: Express.Request, res: Express.Response, next: Middleware) => void} Middleware
@@ -52,20 +54,11 @@ let method = (router, controller) => {
               errorFun.throw(
                 req,
                 res,
-                new BaseError({
-                  status: 500,
-                  title: 'invalidHandlerUnderController',
-                  detail:
-                    handlerMethodName +
-                    ' handler does not exist under controller or it is not a callable function',
-                  meta: {
-                    controller: controller
-                  }
-                })
+                new InvalidHandlerUnderController(handlerMethodName, controller)
               );
             }
           } catch (err) {
-            logger.error(err);
+            errorFun.internal(req, res, err);
           }
         });
       };
