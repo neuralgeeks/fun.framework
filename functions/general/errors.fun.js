@@ -84,7 +84,7 @@ let thrower = (req, res, error) => {
 let internal = (req, res, error) => {
   if (res.headersSent) logger.error(error);
   else {
-    let internalError = GenericInternalServerError({
+    let internalError = new GenericInternalServerError({
       detail: 'An unexpected exception has occurred.',
       meta: { route: req.originalUrl, error: error }
     });
