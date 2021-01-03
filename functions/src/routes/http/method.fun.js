@@ -46,7 +46,7 @@ let method = (router, controller) => {
             // call handler
             let handler = controller[handlerMethodName];
             if (handler && typeof handler === 'function') {
-              await controller[handlerMethodName](res, res, validated);
+              await controller[handlerMethodName](req, res, validated);
               logger.info(
                 req.originalUrl + ' response sent with status ' + res.statusCode
               );
