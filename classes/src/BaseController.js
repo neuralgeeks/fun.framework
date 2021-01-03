@@ -44,7 +44,7 @@ class BaseController {
    * @returns    {(any) => never}        The error handler
    */
   catch(req, res, error) {
-    errorFun.catch(req, res, error);
+    return errorFun.catch(req, res, error);
   }
 
   /**
