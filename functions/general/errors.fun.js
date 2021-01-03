@@ -31,7 +31,7 @@ let catcher = (req, res, error) => {
     if (res.headersSent)
       throw new ExceptionAfterHeadersSentError('fun.catch', {
         route: req.originalUrl,
-        originalError: error
+        originalError: error.compact()
       }).compact();
 
     res.status(error.status).json({ errors: [error.compact()] });
@@ -62,7 +62,7 @@ let thrower = (req, res, error) => {
   if (res.headersSent)
     throw new ExceptionAfterHeadersSentError('fun.throw', {
       route: req.originalUrl,
-      originalError: error
+      originalError: error.compact()
     }).compact();
 
   res.status(error.status).json({ errors: [error.compact()] });
