@@ -1,14 +1,27 @@
 {
   "name": "fun.framework",
-  "version": "0.3.0-0",
-  "description": "A fun, intuitive, expresive and elegant web application framework.",
+  "version": "0.3.0",
+  "description": "A fun, intuitive and expressive node.js web application framework based on express.",
   "scripts": {
-    "test": "echo \"No test specified\""
+    "test": "echo \"Test are currently under development 🛠. Please stay tuned for updates ⌚️.\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/neuralgeeks/fun.framework.git"
   },
+  "keywords": [
+    "fun",
+    "fun.framework",
+    "express",
+    "framework",
+    "web",
+    "rest",
+    "restful",
+    "functional",
+    "app",
+    "api",
+    "cli"
+  ],
   "author": "neuralgeeks",
   "license": "Apache-2.0",
   "bugs": {

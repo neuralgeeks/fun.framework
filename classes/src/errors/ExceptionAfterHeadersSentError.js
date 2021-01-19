@@ -1,5 +1,6 @@
-const BaseError = require('../../BaseError');
+const BaseError = require('../BaseError');
 
+/**
 /**
  * @license
  * Copyright 2020 neuralgeeks LLC.
@@ -17,15 +18,16 @@ const BaseError = require('../../BaseError');
  * limitations under the License.
  */
 
-class MissingJWTError extends BaseError {
-  constructor() {
+class ExceptionAfterHeadersSentError extends BaseError {
+  constructor(method, meta) {
     let feed = {
-      status: 400,
-      title: 'missingJWT',
-      detail: 'Bad request, there was no authorization JWT specified'
+      status: 500,
+      title: 'exceptionAfterHeadersSent',
+      detail: `The server triggered an exception using ${method} after the headers were sent, the server is unable to send JSONAPI error response. Please check you code, there may be some inconsistencies.`,
+      meta: meta
     };
     super(feed);
   }
 }
 
-module.exports = MissingJWTError;
+module.exports = ExceptionAfterHeadersSentError;

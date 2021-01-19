@@ -1,4 +1,4 @@
-const BaseError = require('../../BaseError');
+const BaseError = require('../BaseError');
 
 /**
  * @license
@@ -17,15 +17,18 @@ const BaseError = require('../../BaseError');
  * limitations under the License.
  */
 
-class MissingJWTError extends BaseError {
-  constructor() {
+class InvalidHandlerUnderControllerError extends BaseError {
+  constructor(handlerMethodName, controller) {
     let feed = {
-      status: 400,
-      title: 'missingJWT',
-      detail: 'Bad request, there was no authorization JWT specified'
+      status: 500,
+      title: 'invalidHandlerUnderController',
+      detail: `${handlerMethodName} handler does not exist under controller or it is not a callable function`,
+      meta: {
+        controller: controller.constructor.name
+      }
     };
     super(feed);
   }
 }
 
-module.exports = MissingJWTError;
+module.exports = InvalidHandlerUnderControllerError;

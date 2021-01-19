@@ -1,4 +1,4 @@
-const BaseError = require('../../BaseError');
+const BaseError = require('../BaseError');
 
 /**
  * @license
@@ -17,15 +17,16 @@ const BaseError = require('../../BaseError');
  * limitations under the License.
  */
 
-class MissingJWTError extends BaseError {
-  constructor() {
+class GenericInternalServerError extends BaseError {
+  constructor({ meta = {}, detail = 'The server encountered an exception.' }) {
     let feed = {
-      status: 400,
-      title: 'missingJWT',
-      detail: 'Bad request, there was no authorization JWT specified'
+      status: 500,
+      title: 'internalServerError',
+      detail: detail,
+      meta: meta
     };
     super(feed);
   }
 }
 
-module.exports = MissingJWTError;
+module.exports = GenericInternalServerError;
