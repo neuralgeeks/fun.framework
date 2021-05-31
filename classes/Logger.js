@@ -54,6 +54,19 @@ class Logger {
   static name = 'server';
 
   /**
+   * Wether debbug is active or not
+   *
+   * @since  0.1.0
+   * @access public
+   *
+   * @type     {Boolean}
+   *
+   * @member   {Boolean} debug
+   * @memberof Logger
+   */
+  static debug = true;
+
+  /**
    * The winston logger instance.
    *
    * @since  0.1.0
@@ -77,10 +90,15 @@ class Logger {
    * @constructs Logger
    *
    * @param {String} [name] The new service name.
+   * @param {Boolean} [debug] Wether debbug is active or not.
    */
-  constructor(name) {
+  constructor(name, debug) {
     if (name != undefined) {
       Logger.name = name;
+    }
+
+    if (debug != undefined) {
+      Logger.debug = debug;
     }
 
     this.logger = winston.createLogger({
@@ -145,7 +163,7 @@ class Logger {
    * @param {String} message The message to write.
    */
   debug(message) {
-    if (env == 'test') return;
+    if (env == 'test' || !Logger.debug) return;
 
     console.log(
       colors.fgMagenta +

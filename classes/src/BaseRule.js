@@ -68,7 +68,7 @@ class BaseRule {
       return result;
     } catch (e) {
       if (await this.debug()) {
-        logger.debug('Exeption raised while evaluating ' + this.name);
+        logger.debug('Exception raised while evaluating ' + this.name);
         logger.debug(e);
         logger.debug(this.name + ' evaluation returned false');
       }

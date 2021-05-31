@@ -56,15 +56,14 @@ let method = (router, controller) => {
         router[method](route, middlewares, async (req, res) => {
           try {
             // get validated params
-            logger.info(validator.name + ' validation running');
             let validated = await validator.validate(req, res);
-            logger.info('Request is valid, validated by ' + validator.name);
+            logger.debug('Request is valid, validated by ' + validator.name);
 
             // call handler
             let handler = controller[handlerMethodName];
             if (handler && typeof handler === 'function') {
               await controller[handlerMethodName](req, res, validated);
-              logger.info(
+              logger.debug(
                 req.originalUrl + ' response sent with status ' + res.statusCode
               );
             } else {
