@@ -54,7 +54,7 @@ class Logger {
   static name = 'server';
 
   /**
-   * Wether debbug is active or not
+   * Wether debug is active or not
    *
    * @since  0.1.0
    * @access public
@@ -65,6 +65,32 @@ class Logger {
    * @memberof Logger
    */
   static debug = true;
+
+  /**
+   * Wether error is active or not
+   *
+   * @since  0.1.0
+   * @access public
+   *
+   * @type     {Boolean}
+   *
+   * @member   {Boolean} error
+   * @memberof Logger
+   */
+  static error = true;
+
+  /**
+   * Wether info is active or not
+   *
+   * @since  0.1.0
+   * @access public
+   *
+   * @type     {Boolean}
+   *
+   * @member   {Boolean} info
+   * @memberof Logger
+   */
+  static info = true;
 
   /**
    * The winston logger instance.
@@ -90,15 +116,23 @@ class Logger {
    * @constructs Logger
    *
    * @param {String} [name] The new service name.
-   * @param {Boolean} [debug] Wether debbug is active or not.
+   * @param {{debug: Boolean, info: Boolean, error: Boolean}} [level] Whether each loggger level is active or not.
    */
-  constructor(name, debug) {
+  constructor(name, { debug, info, error }) {
     if (name != undefined) {
       Logger.name = name;
     }
 
     if (debug != undefined) {
       Logger.debug = debug;
+    }
+
+    if (info != undefined) {
+      Logger.info = info;
+    }
+
+    if (error != undefined) {
+      Logger.error = error;
     }
 
     this.logger = winston.createLogger({
@@ -130,7 +164,7 @@ class Logger {
    * @param {String} message The message to write.
    */
   info(message) {
-    if (env == 'test') return;
+    if (env == 'test' || !Logger.info) return;
 
     console.log(
       colors.fgMagenta +
@@ -196,7 +230,7 @@ class Logger {
    * @param {String} error The error to write.
    */
   error(error) {
-    if (env == 'test') return;
+    if (env == 'test' || !Logger.error) return;
 
     console.error(
       colors.fgMagenta +
