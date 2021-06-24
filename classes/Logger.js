@@ -118,7 +118,7 @@ class Logger {
    * @param {String} [name] The new service name.
    * @param {{debug: Boolean, info: Boolean, error: Boolean}} [level] Whether each loggger level is active or not.
    */
-  constructor(name, { debug, info, error }) {
+  constructor(name, { debug, info, error } = {}) {
     if (name != undefined) {
       Logger.name = name;
     }
