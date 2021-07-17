@@ -1,5 +1,4 @@
-const winston = require('winston');
-const timeFun = require('../functions/general/time.fun');
+const moment = require('moment');
 const env = process.env.NODE_ENV || 'development';
 
 const colors = {
@@ -31,226 +30,105 @@ const colors = {
 /**
  * Customized Logger.
  *
- * This class is an enhancement of @code{console.log},
- * it provides better logging and also support microservice logging
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs Logger
+ * This class is an enhancement of `console.log`,
+ * it provides better logging and also supports microservice logging
  */
 class Logger {
   /**
    * The service logging name
    *
-   * @since  0.1.0
-   * @access public
-   *
    * @type     {String}
-   *
-   * @member   {String} name
-   * @memberof Logger
    */
   static name = 'server';
 
   /**
-   * Wether debug is active or not
-   *
-   * @since  0.1.0
-   * @access public
+   * Whether debug is active or not
    *
    * @type     {Boolean}
-   *
-   * @member   {Boolean} debug
-   * @memberof Logger
    */
   static debug = true;
 
   /**
-   * Wether error is active or not
-   *
-   * @since  0.1.0
-   * @access public
+   * Whether error is active or not
    *
    * @type     {Boolean}
-   *
-   * @member   {Boolean} error
-   * @memberof Logger
    */
   static error = true;
 
   /**
-   * Wether info is active or not
-   *
-   * @since  0.1.0
-   * @access public
+   * Whether info is active or not
    *
    * @type     {Boolean}
-   *
-   * @member   {Boolean} info
-   * @memberof Logger
    */
   static info = true;
-
-  /**
-   * The winston logger instance.
-   *
-   * @since  0.1.0
-   * @access private
-   *
-   * @type     {winston.Logger}
-   *
-   * @member   {winston.Logger} logger
-   * @memberof Logger
-   */
-  #logger = undefined;
 
   /**
    * Logger constructor.
    *
    * Constructs a logger and sets the service logger name if given.
    *
-   * @since      0.1.0
-   * @access     public
-   *
-   * @constructs Logger
-   *
    * @param {String} [name] The new service name.
-   * @param {{debug: Boolean, info: Boolean, error: Boolean}} [level] Whether each loggger level is active or not.
+   * @param {{debug: Boolean, info: Boolean, error: Boolean}} [level] Whether each logger level is active or not.
    */
   constructor(name, { debug, info, error } = {}) {
-    if (name != undefined) {
-      Logger.name = name;
-    }
-
-    if (debug != undefined) {
-      Logger.debug = debug;
-    }
-
-    if (info != undefined) {
-      Logger.info = info;
-    }
-
-    if (error != undefined) {
-      Logger.error = error;
-    }
-
-    this.logger = winston.createLogger({
-      format: winston.format.json(),
-      defaultMeta: { service: Logger.name }
-    });
-
-    if (env !== 'test') {
-      this.logger.add(
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: 'error'
-        })
-      );
-
-      this.logger.add(
-        new winston.transports.File({ filename: 'logs/combined.log' })
-      );
-    }
+    if (name) Logger.name = name;
+    if (debug) Logger.debug = debug;
+    if (info) Logger.info = info;
+    if (error) Logger.error = error;
   }
 
   /**
    * Writes a message into the info logging channel.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Logger
-   *
    * @param {String} message The message to write.
    */
   info(message) {
-    if (env == 'test' || !Logger.info) return;
+    if (env === 'test' || !Logger.info) return;
 
     console.log(
-      colors.fgMagenta +
-        timeFun.datetime() +
-        colors.reset +
-        ' - ' +
-        colors.fgCyan +
-        Logger.name +
-        colors.reset +
-        ' - ' +
-        colors.fgGreen +
-        'INFO' +
-        colors.reset +
-        ':',
+      [
+        `${colors.fgMagenta}${moment().toISOString()}${colors.reset}`,
+        `- ${colors.fgCyan}${Logger.name}${colors.reset}`,
+        `- ${colors.fgGreen}INFO${colors.reset}:`
+      ].join(' '),
       message
     );
-    this.logger.info({
-      timestamp: timeFun.datetime(),
-      message: message
-    });
   }
 
   /**
    * Writes a message into the debug logging channel.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Logger
-   *
    * @param {String} message The message to write.
    */
   debug(message) {
-    if (env == 'test' || !Logger.debug) return;
+    if (env === 'test' || !Logger.debug) return;
 
     console.log(
-      colors.fgMagenta +
-        timeFun.datetime() +
-        colors.reset +
-        ' - ' +
-        colors.fgCyan +
-        Logger.name +
-        colors.reset +
-        ' - ' +
-        colors.fgYellow +
-        'DEBUG' +
-        colors.reset +
-        ':',
+      [
+        `${colors.fgMagenta}${moment().toISOString()}${colors.reset}`,
+        `- ${colors.fgCyan}${Logger.name}${colors.reset}`,
+        `- ${colors.fgYellow}DEBUG${colors.reset}:`
+      ].join(' '),
       message
     );
-    this.logger.debug({
-      timestamp: timeFun.datetime(),
-      message: message
-    });
   }
 
   /**
    * Writes an error into the error logging channel.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Logger
-   *
    * @param {String} error The error to write.
    */
   error(error) {
-    if (env == 'test' || !Logger.error) return;
+    if (env === 'test' || !Logger.error) return;
 
-    console.error(
-      colors.fgMagenta +
-        timeFun.datetime() +
-        colors.reset +
-        ' - ' +
-        colors.fgCyan +
-        Logger.name +
-        colors.reset +
-        ' - ' +
-        colors.fgRed +
-        'ERROR' +
-        colors.reset +
-        ':',
+    console.log(
+      [
+        `${colors.fgMagenta}${moment().toISOString()}${colors.reset}`,
+        `- ${colors.fgCyan}${Logger.name}${colors.reset}`,
+        `- ${colors.fgRed}ERROR${colors.reset}:`
+      ].join(' '),
       error
     );
-    this.logger.error({
-      timestamp: timeFun.datetime(),
-      message: error
-    });
   }
 }
 

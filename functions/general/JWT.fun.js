@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const fun = require('./errors.fun');
-const BaseError = require('../../classes/src/BaseError');
 
 const Errors = require('../../classes/src/errors');
 
@@ -24,8 +23,6 @@ const Errors = require('../../classes/src/errors');
 /**
  * Decodes an http Bearer JWT token authentication from an express request.
  *
- * @since  0.3.0
- *
  * @param {Express.Request}       req      An express request
  * @param {Express.Response}      res      An express response
  *
@@ -33,51 +30,43 @@ const Errors = require('../../classes/src/errors');
  *
  * @returns {{decoded: any, token: string}} The given bearer token and the decoded JWT content
  */
-let httpDecodeBearerScheme = (req, res) => {
-  // ---------------------- getting the Auth -------------------- //
+const httpDecodeBearerScheme = (req, res) => {
+  //---------------------- getting the Auth
   let auth = req.get('Authorization');
   if (!auth) {
     let reason = 'Missing authorization.';
     fun.throw(req, res, new Errors.UnauthorizedError(reason));
   }
-  auth = auth.trim();
-  let authSplit = auth.split(' ');
 
-  // ------------------- validating auth scheme ----------------- //
-  let authScheme = authSplit[0];
-  if (authScheme != 'Bearer') {
-    let reason = 'Wrong auth scheme, expected Bearer. given: ' + authScheme;
+  let [authScheme, token] = auth.trim().split(' ');
+
+  //---------------------- validating auth scheme
+  if (authScheme !== 'Bearer') {
+    let reason = `Wrong auth scheme, expected Bearer. given: ${authScheme}`;
     fun.throw(req, res, new Errors.UnauthorizedError(reason));
   }
 
-  // ------------------ validating the token -------------------- //
-  let token = authSplit[1];
-  if (!token) {
-    fun.throw(req, res, new Errors.JWT.MissingJWTError());
-  }
+  //---------------------- validating the token
+  if (!token) fun.throw(req, res, new Errors.JWT.MissingJWTError());
 
-  // ------------------ decoding the Auth JWT ------------------- //
+  //---------------------- decoding the Auth JWT
+  let decoded;
   try {
-    let decoded = jwt.decode(token);
-    if (!decoded) {
-      fun.throw(req, res, new Errors.JWT.BadJWTError(token));
-    }
-
-    return {
-      decoded: decoded,
-      token: token
-    };
+    decoded = jwt.decode(token);
   } catch {
-    fun.throw(req, res, new Errors.JWT.BadJWTError(token));
+    decoded = null;
   }
+
+  if (!decoded) fun.throw(req, res, new Errors.JWT.BadJWTError(token));
+
+  return {
+    decoded: decoded,
+    token: token
+  };
 };
 
 /**
  * Verifies an user's http JWT scheme using the decoded content and a source funtion.
- *
- * @since  0.3.0
- *
- * @async
  *
  * @param {Express.Request}       req                       An express request
  * @param {Express.Response}      res                       An express response
@@ -100,7 +89,7 @@ let httpDecodeBearerScheme = (req, res) => {
  *
  * @throws {BaseError} If an error occurs while verifying the scheme. This error gets automatically sent to the response using fun.throw.
  */
-let httpVerifyUserToken = async (
+const httpVerifyUserToken = async (
   req,
   res,
   schema,
@@ -110,19 +99,18 @@ let httpVerifyUserToken = async (
     indexRejectionFunction: isNaN
   }
 ) => {
-  // ----------------- validate decoded user id ------------------ //
+  //---------------------- validate decoded user id
   let id = httpValidateUserIdentifierFromSchema(req, res, schema, {
     indexingProperty: indexingProperty,
     rejectionFunction: indexRejectionFunction
   });
 
-  // --------------- getting the valid JWT secret ---------------- //
+  //---------------------- getting the valid JWT secret
   let validJWT = await source(id);
-  if (!validJWT) {
+  if (!validJWT)
     fun.throw(req, res, new Errors.JWT.InvalidJWTError(schema.token));
-  }
 
-  // -------------------- verifying the JWT -------------------- //
+  //---------------------- verifying the JWT
   try {
     jwt.verify(schema.token, validJWT.secret);
   } catch {
@@ -132,10 +120,6 @@ let httpVerifyUserToken = async (
 
 /**
  * Validates and returns the user identifier from the http JWT scheme.
- *
- * @since  0.3.0
- *
- * @async
  *
  * @param {Express.Request}        req                       An express request
  * @param {Express.Response}       res                       An express response
@@ -155,7 +139,7 @@ let httpVerifyUserToken = async (
  *
  * @returns {any} The user identifier.
  */
-let httpValidateUserIdentifierFromSchema = (
+const httpValidateUserIdentifierFromSchema = (
   req,
   res,
   schema,
@@ -165,62 +149,50 @@ let httpValidateUserIdentifierFromSchema = (
   }
 ) => {
   let id = schema.decoded[indexingProperty];
-  if (rejectionFunction(id)) {
+  if (rejectionFunction(id))
     fun.throw(req, res, new Errors.JWT.BadJWTError(schema.token));
-  }
+
   return id;
 };
 
 /**
  * Decodes a Bearer JWT token authentication from an authorization string.
  *
- * @since  0.3.0
- *
- * @param {string}                authorization      An authorization string.
+ * @param {string} authorization  An authorization string.
  *
  * @throws {string} If an exception occurs while decoding the scheme. The error ```string``` shows the reason of the exception.
  *
  * @returns {{decoded: any, token: string}} The given bearer token and the decoded JWT content.
  */
-let decodeBearerScheme = (authorization) => {
-  // ---------------------- getting the Auth -------------------- //
-  let auth = authorization.trim();
-  let authSplit = auth.split(' ');
+const decodeBearerScheme = (authorization) => {
+  //---------------------- getting the Auth
+  let [authScheme, token] = authorization.trim().split(' ');
 
-  // ------------------- validating auth scheme ----------------- //
-  let authScheme = authSplit[0];
-  if (authScheme != 'Bearer') {
-    throw 'Wrong auth scheme, expected Bearer. given: ' + authScheme;
-  }
+  //---------------------- validating auth scheme
+  if (authScheme != 'Bearer')
+    throw `Wrong auth scheme, expected Bearer. given: ${authScheme}`;
 
-  // ------------------ validating the token -------------------- //
-  let token = authSplit[1];
-  if (!token) {
-    throw 'Missing JWT.';
-  }
+  //---------------------- validating the token
+  if (!token) throw 'Missing JWT.';
 
-  // ------------------ decoding the Auth JWT ------------------- //
+  //---------------------- decoding the Auth JWT
+  let decoded;
   try {
-    let decoded = jwt.decode(token);
-    if (!decoded) {
-      throw 'Bad JWT.';
-    }
-
-    return {
-      decoded: decoded,
-      token: token
-    };
+    decoded = jwt.decode(token);
   } catch {
-    throw 'Bad JWT.';
+    decoded = null;
   }
+
+  if (!decoded) throw 'Bad JWT.';
+
+  return {
+    decoded: decoded,
+    token: token
+  };
 };
 
 /**
  * Verifies an user's JWT scheme using the decoded content and a source funtion.
- *
- * @since  0.3.0
- *
- * @async
  *
  * @param {{decoded: any,
  *          token: string}}       schema                    The JWT decoded scheme
@@ -240,7 +212,7 @@ let decodeBearerScheme = (authorization) => {
  *
  * @throws {string} If an error occurs while verifying the scheme. The error ```string``` shows the reason of the exception.
  */
-let verifyUserToken = async (
+const verifyUserToken = async (
   schema,
   source,
   { indexingProperty, indexRejectionFunction } = {
@@ -248,19 +220,17 @@ let verifyUserToken = async (
     indexRejectionFunction: isNaN
   }
 ) => {
-  // ----------------- validate decoded user id ------------------ //
+  //---------------------- validate decoded user id
   let id = validateUserIdentifierFromSchema(schema, {
     indexingProperty: indexingProperty,
     rejectionFunction: indexRejectionFunction
   });
 
-  // --------------- getting the valid JWT secret ---------------- //
+  //---------------------- getting the valid JWT secret
   let validJWT = await source(id);
-  if (!validJWT) {
-    throw 'Given JWT was invalid or has expirated';
-  }
+  if (!validJWT) throw 'Given JWT was invalid or has expirated';
 
-  // -------------------- verifying the JWT ---------------------- //
+  //---------------------- verifying the JWT
   try {
     jwt.verify(schema.token, validJWT.secret);
   } catch {
@@ -270,10 +240,6 @@ let verifyUserToken = async (
 
 /**
  * Validates and returns the user identifier from the JWT scheme.
- *
- * @since  0.3.0
- *
- * @async
  *
  * @param {{decoded: any,
  *          token: string}}       schema                    The JWT decoded scheme
@@ -290,7 +256,7 @@ let verifyUserToken = async (
  *
  * @returns {any} The user identifier.
  */
-let validateUserIdentifierFromSchema = (
+const validateUserIdentifierFromSchema = (
   schema,
   { indexingProperty, rejectionFunction } = {
     indexingProperty: 'user',
@@ -298,9 +264,9 @@ let validateUserIdentifierFromSchema = (
   }
 ) => {
   let id = schema.decoded[indexingProperty];
-  if (rejectionFunction(id)) {
+  if (rejectionFunction(id))
     throw `Bad JWT. Indexing property '${indexingProperty}' found invalid `;
-  }
+
   return id;
 };
 
@@ -310,7 +276,7 @@ module.exports = {
     verifyUserToken: httpVerifyUserToken,
     validateUserIdentifierFromSchema: httpValidateUserIdentifierFromSchema
   },
-  decodeBearerScheme: decodeBearerScheme,
-  verifyUserToken: verifyUserToken,
-  validateUserIdentifierFromSchema: validateUserIdentifierFromSchema
+  decodeBearerScheme,
+  verifyUserToken,
+  validateUserIdentifierFromSchema
 };

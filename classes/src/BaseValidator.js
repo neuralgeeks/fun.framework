@@ -20,33 +20,17 @@ const errorFun = require('../../functions/general/errors.fun');
 
 /**
  * Base validator representation.
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs BaseValidator
  */
 class BaseValidator {
   /**
    * Validator human readable name
    *
-   * @since    0.1.0
-   * @access   public
-   *
    * @type     {String}
-   *
-   * @member   {String} name
-   * @memberof BaseValidator
    */
   name = 'Base validator';
 
   /**
    * BaseValidator constructor
-   *
-   * @since      0.1.0
-   * @access     public
-   *
-   * @constructs BaseValidator
    */
   constructor() {
     autoBind(this);
@@ -56,10 +40,6 @@ class BaseValidator {
    * Validates a request object and returns the request validated body.
    *
    * If this method throws an error the requests gets invalidated
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseValidator
    *
    * @param      {Express.Request}       req      The request that will be validated
    * @param      {Express.Response}      res      The response associated with the request
@@ -73,10 +53,6 @@ class BaseValidator {
 
   /**
    * Throws a JSONAPI BaseError and sends feedback to the response
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseValidator
    *
    * @param      {Express.Request}       req      The request that throwed the error
    * @param      {Express.Response}      res      The response that will send the error feedback
@@ -92,10 +68,6 @@ class BaseValidator {
   /**
    * Returns a JSONAPI based error handler that throws a JSONAPI BaseError and sends feedback
    * to the response
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseValidator
    *
    * @param      {Express.Request}       req      The request that throwed the error
    * @param      {Express.Response}      res      The response that will send the error feedback

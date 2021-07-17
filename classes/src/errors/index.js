@@ -19,6 +19,6 @@ const UnauthorizedError = require('./UnauthorizedError');
  */
 
 module.exports = {
-  JWT: JWT,
-  UnauthorizedError: UnauthorizedError
+  JWT,
+  UnauthorizedError
 };

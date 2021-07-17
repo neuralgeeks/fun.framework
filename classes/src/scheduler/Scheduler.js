@@ -30,21 +30,12 @@ const BaseSchedule = require('./BaseSchedule');
 
 /**
  * An application Scheduler representation
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs Scheduler
  */
 class Scheduler {
   /**
    * Returns the schedules configurated for the application Scheduler.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Scheduler
-   *
-   * @returns    {[BaseSchedule]}   The configurated schedules for the application.
+   * @returns    {BaseSchedule[]}   The configurated schedules for the application.
    */
   schedules() {
     return [];
@@ -54,10 +45,6 @@ class Scheduler {
    * Starts the application scheduler.
    *
    * This method should be final.
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Scheduler
    */
   start() {
     R.forEach((schedule) => {
@@ -70,10 +57,6 @@ class Scheduler {
   /**
    * Schedules an schedule javascript interval if needed
    *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   Scheduler
-   *
    * @param {BaseSchedule} schedule
    */
   scheduleInterval(schedule) {
@@ -81,29 +64,19 @@ class Scheduler {
 
     setInterval(() => {
       logger.info(
-        colors.bfScheduler +
-          'SCHEDULER' +
-          colors.reset +
-          ' Executing ' +
-          colors.bfSchedule +
-          schedule.name +
-          colors.reset +
-          ' scheduled' +
-          colors.bfMethod +
-          ' interval' +
-          colors.reset +
-          ' callback'
+        [
+          `${colors.bfScheduler}SCHEDULER${colors.reset} Executing`,
+          `${colors.bfSchedule}${schedule.name}${colors.reset} scheduled`,
+          `${colors.bfMethod}interval${colors.reset} callback`
+        ].join(' ')
       );
+
       schedule.intervalCallback();
     }, schedule.interval);
   }
 
   /**
    * Schedules an schedule cronjob if needed
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   Scheduler
    *
    * @param {BaseSchedule} schedule
    */
@@ -112,19 +85,13 @@ class Scheduler {
 
     let job = new CronJob(schedule.cron, () => {
       logger.info(
-        colors.bfScheduler +
-          'SCHEDULER' +
-          colors.reset +
-          ' Executing ' +
-          colors.bfSchedule +
-          schedule.name +
-          colors.reset +
-          ' scheduled' +
-          colors.bfMethod +
-          ' cronjob' +
-          colors.reset +
-          ' callback'
+        [
+          `${colors.bfScheduler}SCHEDULER${colors.reset} Executing`,
+          `${colors.bfSchedule}${schedule.name}${colors.reset} scheduled`,
+          `${colors.bfMethod}cronjob${colors.reset} callback`
+        ].join(' ')
       );
+
       schedule.cronCallback();
     });
     job.start();
@@ -133,10 +100,6 @@ class Scheduler {
   /**
    * Schedules an schedule javascript timeout if needed
    *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   Scheduler
-   *
    * @param {BaseSchedule} schedule
    */
   scheduleTimeout(schedule) {
@@ -144,19 +107,13 @@ class Scheduler {
 
     setTimeout(() => {
       logger.info(
-        colors.bfScheduler +
-          'SCHEDULER' +
-          colors.reset +
-          ' Executing ' +
-          colors.bfSchedule +
-          schedule.name +
-          colors.reset +
-          ' scheduled' +
-          colors.bfMethod +
-          ' timeout' +
-          colors.reset +
-          ' callback'
+        [
+          `${colors.bfScheduler}SCHEDULER${colors.reset} Executing`,
+          `${colors.bfSchedule}${schedule.name}${colors.reset} scheduled`,
+          `${colors.bfMethod}timeout${colors.reset} callback`
+        ].join(' ')
       );
+
       schedule.timeoutCallback();
     }, schedule.timeout);
   }

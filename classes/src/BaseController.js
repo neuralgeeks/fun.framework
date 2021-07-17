@@ -1,5 +1,7 @@
-const errorFun = require('../../functions/general/errors.fun');
 const R = require('ramda');
+const autoBind = require('auto-bind');
+
+const errorFun = require('../../functions/general/errors.fun');
 const JSONAPIFun = require('../../functions/JSONAPI/JSONAPI.fun');
 
 /**
@@ -21,19 +23,17 @@ const JSONAPIFun = require('../../functions/JSONAPI/JSONAPI.fun');
 
 /**
  * Base controller representation.
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs BaseController
  */
 class BaseController {
   /**
+   * BaseController constructor.
+   */
+  constructor() {
+    autoBind(this);
+  }
+
+  /**
    * Throws a JSONAPI BaseError and sends feedback to the response
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseController
    *
    * @param      {Express.Request}       req      The request that throwed the error
    * @param      {Express.Response}      res      The response that will send the error feedback
@@ -50,10 +50,6 @@ class BaseController {
    * Returns a JSONAPI based error handler that throws a JSONAPI BaseError and sends feedback
    * to the response
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseController
-   *
    * @param      {Express.Request}       req      The request that throwed the error
    * @param      {Express.Response}      res      The response that will send the error feedback
    * @param      {BaseError}             [error]  The JSONAPI error to be thrown
@@ -67,10 +63,6 @@ class BaseController {
   /**
    * Returns a decorated express response object that contains JSONAPI standard functionality
    * and transform pattern support
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseController
    *
    * @param      {Express.Response}    res      The express response to be decorated
    * @param      {Number}              [code]   The status to code of the decorated response

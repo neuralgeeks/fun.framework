@@ -1,6 +1,5 @@
 const Logger = require('../../../../classes/Logger');
 const logger = new Logger();
-const BaseError = require('../../../../classes/src/BaseError');
 const BaseValidator = require('../../../../classes/src/BaseValidator');
 const errorFun = require('../../../general/errors.fun');
 const BaseController = require('../../../../classes/src/BaseController');
@@ -31,7 +30,7 @@ const InvalidHandlerUnderControllerError = require('../../../../classes/src/erro
 
 /**
  * A fun route, product of a router method high order function
- * @typedef {(middleware: [Middleware] = []) => void} Route
+ * @typedef {(middleware: Middleware[] = []) => void} Route
  */
 
 /**
@@ -42,47 +41,42 @@ const InvalidHandlerUnderControllerError = require('../../../../classes/src/erro
 /**
  * Encapsulates a fun router HTTP method route
  *
- * @since  0.1.0
- *
  * @param {Express.Router}   router       The router that will handle the method.
  * @param {BaseController}   controller   The controller that will handle the resource.
  *
  * @returns {(method: String) => Method } A high grade funtion that handles a http method route.
  */
-let method = (router, controller) => {
-  return (method) => {
-    return (route, handlerMethodName, validator = new BaseValidator()) => {
-      return (middlewares = []) => {
-        router[method](route, middlewares, async (req, res) => {
-          try {
-            // get validated params
-            let validated = await validator.validate(req, res);
-            logger.debug('Request is valid, validated by ' + validator.name);
+const method =
+  (router, controller) =>
+  (method) =>
+  (route, handlerMethodName, validator = new BaseValidator()) =>
+  (middlewares = []) => {
+    router[method](route, middlewares, async (req, res) => {
+      try {
+        // get validated params
+        let validated = await validator.validate(req, res);
+        logger.debug(`Request is valid, validated by ${validator.name}`);
 
-            // call handler
-            let handler = controller[handlerMethodName];
-            if (handler && typeof handler === 'function') {
-              await controller[handlerMethodName](req, res, validated);
-              logger.debug(
-                req.originalUrl + ' response sent with status ' + res.statusCode
-              );
-            } else {
-              errorFun.throw(
-                req,
-                res,
-                new InvalidHandlerUnderControllerError(
-                  handlerMethodName,
-                  controller
-                )
-              );
-            }
-          } catch (err) {
-            errorFun.internal(req, res, err);
-          }
-        });
-      };
-    };
+        // call handler
+        let handler = controller[handlerMethodName];
+        if (handler && typeof handler === 'function') {
+          await controller[handlerMethodName](req, res, validated);
+          logger.debug(
+            `${req.originalUrl} response sent with status ${res.statusCode}`
+          );
+        } else
+          errorFun.throw(
+            req,
+            res,
+            new InvalidHandlerUnderControllerError(
+              handlerMethodName,
+              controller
+            )
+          );
+      } catch (err) {
+        errorFun.internal(req, res, err);
+      }
+    });
   };
-};
 
 module.exports = method;

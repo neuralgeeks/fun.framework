@@ -27,24 +27,12 @@ const BaseRule = require('../BaseRule');
 
 /**
  * An application WebSocket Broadcaster representation
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs Broadcaster
  */
 class Broadcaster {
   /**
-   * Validator human readable name
-   *
-   * @since    0.1.0
-   * @access   public
-   * @static
+   * The socket.io instance of the application
    *
    * @type     {SocketIO.Server}
-   *
-   * @member   {SocketIO.Server} io
-   * @memberof Broadcaster
    */
   static io = null;
 
@@ -52,10 +40,6 @@ class Broadcaster {
    * Sets the static value of the socket.io server.
    *
    * This method should be final
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Broadcaster
    *
    * @param      {SocketIO.Server}   io  The socket.io server
    */
@@ -66,11 +50,7 @@ class Broadcaster {
   /**
    * Returns the channels configurated for the application broadcaster.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Broadcaster
-   *
-   * @returns    {[{ name: string, rules: [BaseRule] }]}   The configurated channels for the application.
+   * @returns    {{ name: string, rules: BaseRule[] }[]}   The configurated channels for the application.
    */
   channels() {
     return [];
@@ -80,10 +60,6 @@ class Broadcaster {
    * Returns if there's a configurated channel that matches the given name.
    *
    * This method should be final
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Broadcaster
    *
    * @param      {string}   name     The name to match
    * @returns    {boolean}           Whether or not there's a configurated channel that matches the given name.
@@ -97,33 +73,27 @@ class Broadcaster {
    *
    * This method should be final
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   Broadcaster
-   *
    * @param      {string}   to      The name of the channel to broadcast to.
    * @param      {string}   event   The name of the event to broadcast.
    * @param      {any}      data    The data of the event.
-   *
-   * @returns    {void}
    */
   broadcast(to, event, data) {
-    if (!Broadcaster.io)
+    if (!Broadcaster.io) {
       logger.error(
-        colors.bfBroadcaster +
-          'BROADCASTER' +
-          colors.reset +
-          ' Could not broadcast data, io found undefined'
+        [
+          `${colors.bfBroadcaster}BROADCASTER${colors.reset}`,
+          'Could not broadcast data, io found undefined'
+        ].join(' ')
       );
+      return;
+    }
 
-    let exist = R.any((channel) => {
-      return channel.name == to;
-    }, this.channels());
+    let exists = R.any((channel) => channel.name === to, this.channels());
 
-    if (exist) {
+    if (exists) {
       Broadcaster.io.to(to).emit(event, data);
       logger.info(
-        colors.bfBroadcaster + 'BROADCASTER' + colors.reset + ' broadcasted:'
+        `${colors.bfBroadcaster}BROADCASTER${colors.reset} broadcasted:`
       );
       logger.info({
         channel: to,
@@ -132,12 +102,10 @@ class Broadcaster {
       });
     } else
       logger.error(
-        colors.bfBroadcaster +
-          'BROADCASTER' +
-          colors.reset +
-          ' Could not broadcast data, channel ' +
-          to +
-          ' is not registered'
+        [
+          `${colors.bfBroadcaster}BROADCASTER${colors.reset}`,
+          `Could not broadcast data, channel ${to} is not registered`
+        ].join(' ')
       );
   }
 }

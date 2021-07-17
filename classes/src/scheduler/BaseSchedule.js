@@ -21,11 +21,6 @@ const logger = new Logger();
 
 /**
  * Base schedule representation.
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs BaseSchedule
  */
 class BaseSchedule {
   /**
@@ -37,11 +32,6 @@ class BaseSchedule {
    *
    * timeout and interval are expresed in miliseconds and cron is a valid cronjob string with seconds support.
    *
-   * @since      0.1.0
-   * @access     public
-   *
-   * @constructs BaseSchedule
-   *
    * @param {String} name The schedule name.
    * @param {{
    *    cron: String | undefined,
@@ -50,7 +40,7 @@ class BaseSchedule {
    *  }} params The frecuency parameters of the schedule.
    */
   constructor(name, { cron, timeout, interval }) {
-    this.name = name ? name : 'BaseSchedule';
+    this.name = name || 'BaseSchedule';
     this.cron = this.validateCronPattern(cron);
     this.timeout = this.validateTimeout(timeout);
     this.interval = this.validateInterval(interval);
@@ -58,37 +48,21 @@ class BaseSchedule {
 
   /**
    * The schedule cronjob callback
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseSchedule
    */
   async cronCallback() {}
 
   /**
    * The schedule javascript interval callback
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseSchedule
    */
   async intervalCallback() {}
 
   /**
    * The schedule javascript timeout callback
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseSchedule
    */
   async timeoutCallback() {}
 
   /**
    * Validates the cronjob cron string.
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   BaseSchedule
    *
    * @param      {String | undefined} cron the cron string to validate
    *
@@ -100,21 +74,16 @@ class BaseSchedule {
     // warn if invalid
     if (!cronValidator.isValidCron(cron, { seconds: true })) {
       logger.error(
-        'Found invalid cron value for ' +
-          this.name +
-          ', cronjob will never be executed'
+        `Found invalid cron value for ${this.name}, cronjob will never be executed`
       );
       return null;
     }
+
     return cron;
   }
 
   /**
    * Validates the schedule javascript timeout time.
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   BaseSchedule
    *
    * @param      {Number | undefined} timeout the timeout to validate
    *
@@ -126,21 +95,16 @@ class BaseSchedule {
     // warn if invalid
     if (isNaN(timeout)) {
       logger.error(
-        'Found NaN timeout for ' +
-          this.name +
-          ', timeout will never be executed'
+        `Found NaN timeout for ${this.name}, timeout will never be executed.`
       );
       return null;
     }
+
     return timeout;
   }
 
   /**
    * Validates the schedule javascript interval time.
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   BaseSchedule
    *
    * @param      {Number | undefined} interval the interval to validate
    *
@@ -152,12 +116,11 @@ class BaseSchedule {
     // warn if invalid
     if (isNaN(interval)) {
       logger.error(
-        'Found NaN interval for ' +
-          this.name +
-          ', interval will never be executed'
+        `Found NaN interval for ${this.name}, interval will never be executed.`
       );
       return null;
     }
+
     return interval;
   }
 }

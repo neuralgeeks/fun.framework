@@ -28,7 +28,7 @@ const BaseController = require('../../../../classes/src/BaseController');
 
 /**
  * A fun route, product of a router method high order function evaluation
- * @typedef {(middleware: [Middleware] = []) => void} Route
+ * @typedef {(middleware: Middleware[] = []) => void} Route
  */
 
 /**
@@ -38,8 +38,6 @@ const BaseController = require('../../../../classes/src/BaseController');
 
 /**
  * Encapsulates the available fun http methods
- *
- * @since  0.1.0
  *
  * @param {Express.Router}   router       The router that will handle the http calls.
  * @param {BaseController}   controller   The controller that will handle the http resources.
@@ -52,14 +50,12 @@ const BaseController = require('../../../../classes/src/BaseController');
  *   delete: Method
  * }} An object of http methods
  */
-let http = (router, controller) => {
-  return {
-    post: R.curry(method(router, controller)('post')),
-    get: R.curry(method(router, controller)('get')),
-    put: R.curry(method(router, controller)('put')),
-    patch: R.curry(method(router, controller)('patch')),
-    delete: R.curry(method(router, controller)('delete'))
-  };
-};
+const http = (router, controller) => ({
+  post: R.curry(method(router, controller)('post')),
+  get: R.curry(method(router, controller)('get')),
+  put: R.curry(method(router, controller)('put')),
+  patch: R.curry(method(router, controller)('patch')),
+  delete: R.curry(method(router, controller)('delete'))
+});
 
 module.exports = http;

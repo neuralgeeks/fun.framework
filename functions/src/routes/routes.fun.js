@@ -31,7 +31,7 @@ const BaseController = require('../../../classes/src/BaseController');
 
 /**
  * A fun route, product of a router method high order function evaluation
- * @typedef {(middleware: [Middleware] = []) => void} Route
+ * @typedef {(middleware: Middleware[] = []) => void} Route
  */
 
 /**
@@ -57,19 +57,17 @@ const BaseController = require('../../../classes/src/BaseController');
 
 /**
  * A high order function that handles a routes group.
- * @typedef {(middleware: [Middleware]) => (routes: [Route]) => void} Group
+ * @typedef {(middleware: Middleware[]) => (routes: Route[]) => void} Group
  */
 
 /**
  * A high order function that handles a routes subgroup, this is, a group that behaves as a route
  * so that a group can group it within its routes.
- * @typedef {(middleware: [Middleware]) => (routes: [Route]) => Route} Subgroup
+ * @typedef {(middleware: Middleware[]) => (routes: Route[]) => Route} Subgroup
  */
 
 /**
  * Wraps up all fun routes related methods and high order funtions.
- *
- * @since  0.1.0
  *
  * @param {Express.Router}   router       The router that will handle the routes.
  * @param {BaseController}   controller   The controller that will handle the routes resources.
@@ -85,8 +83,8 @@ const BaseController = require('../../../classes/src/BaseController');
  *   rest: Rest
  * }} Routes related available methods
  */
-let routes = (router, controller) => {
-  return R.mergeAll([
+const routes = (router, controller) =>
+  R.mergeAll([
     http(router, controller),
     {
       group: group(router, controller),
@@ -94,6 +92,5 @@ let routes = (router, controller) => {
       rest: rest(router, controller)
     }
   ]);
-};
 
 module.exports = routes;

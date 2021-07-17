@@ -20,7 +20,7 @@ const InvalidJWTError = require('./InvalidJWTError');
  */
 
 module.exports = {
-  BadJWTError: BadJWTError,
-  MissingJWTError: MissingJWTError,
-  InvalidJWTError: InvalidJWTError
+  BadJWTError,
+  MissingJWTError,
+  InvalidJWTError
 };

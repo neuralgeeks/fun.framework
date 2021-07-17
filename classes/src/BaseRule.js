@@ -20,23 +20,12 @@ const logger = new Logger();
 
 /**
  * Base rule representation.
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs BaseRule
  */
 class BaseRule {
   /**
    * Rule human readable name
    *
-   * @since    0.1.0
-   * @access   public
-   *
    * @type     {String}
-   *
-   * @member   {String} name
-   * @memberof BaseRule
    */
   name = 'BaseRule';
 
@@ -44,10 +33,6 @@ class BaseRule {
    * Parses and validates the body and evaluates the rule predicate.
    *
    * This method should be final
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseRule
    *
    * @param      {any}      data     The data to parse the body from.
    *
@@ -57,20 +42,20 @@ class BaseRule {
     try {
       let body = await this.body(data);
       if (await this.debug()) {
-        logger.debug(this.name + ' body evaluation returned: ');
+        logger.debug(`${this.name} body evaluation returned: `);
         logger.debug(body);
       }
 
       let result = await this.predicate(body);
       if (await this.debug())
-        logger.debug(this.name + ' evaluation returned ' + result);
+        logger.debug(`${this.name} evaluation returned ${result}`);
 
       return result;
     } catch (e) {
       if (await this.debug()) {
-        logger.debug('Exception raised while evaluating ' + this.name);
+        logger.debug(`Exception raised while evaluating ${this.name}`);
         logger.debug(e);
-        logger.debug(this.name + ' evaluation returned false');
+        logger.debug(`${this.name} evaluation returned false`);
       }
       return false;
     }
@@ -81,10 +66,6 @@ class BaseRule {
    *
    * The output of this method will be used to evaluate the rule predicate.
    * If this method throws an error, the body gets invalidated and thus the rule predicate.
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseRule
    *
    * @param      {any}      data  The data to parse the body from.
    *
@@ -101,10 +82,6 @@ class BaseRule {
    * The output of this method will be used to evaluate the rule predicate.
    * If this method throws an error, the body gets invalidated and thus the rule predicate.
    *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseRule
-   *
    * @param      {any}      data  The data to parse the body from.
    *
    * @returns    {boolean}         The predicate's output
@@ -115,10 +92,6 @@ class BaseRule {
 
   /**
    * Returns wheter or not the rule should debug it's evaluation process.
-   *
-   * @since      0.1.0
-   * @access     public
-   * @memberof   BaseRule
    *
    * @param      {any}      data  The data to parse the body from.
    *

@@ -25,42 +25,36 @@ const ExceptionAfterHeadersSentError = require('../../classes/src/errors/Excepti
  * Returns a JSONAPI based error handler that throws a JSONAPI error and sends feedback
  * to the response.
  *
- * @since  0.1.0
- *
  * @param {Express.Request}       req      The request that throwed the error
  * @param {Express.Response}      res      The response that will send the error feedback
  * @param {BaseError}             [error]  The JSONAPI error to be thrown
  *
  * @returns {(any) => never} The error handler
  */
-let catcher = (req, res, error) => {
-  return async (catchedError) => {
-    // Case: the response error is not defined
-    if (!error)
-      error = new GenericInternalServerError({
-        meta: { route: req.originalUrl }
-      });
+const catcher = (req, res, error) => (catchedError) => {
+  // Case: the response error is not defined
+  if (!error)
+    error = new GenericInternalServerError({
+      meta: { route: req.originalUrl }
+    });
 
-    // Attaching the catched error
-    error.meta.internalError = catchedError;
+  // Attaching the catched error
+  error.meta.internalError = catchedError;
 
-    // Case: headers already sent
-    if (res.headersSent)
-      throw new ExceptionAfterHeadersSentError('fun.catch', {
-        route: req.originalUrl,
-        originalError: error.compact()
-      }).compact();
+  // Case: headers already sent
+  if (res.headersSent)
+    throw new ExceptionAfterHeadersSentError('fun.catch', {
+      route: req.originalUrl,
+      originalError: error.compact()
+    }).compact();
 
-    res.status(error.status).json({ errors: [error.compact()] });
+  res.status(error.status).json({ errors: [error.compact()] });
 
-    throw error.compact();
-  };
+  throw error.compact();
 };
 
 /**
  * Throws a JSONAPI error and sends feedback to the response.
- *
- * @since  0.1.0
  *
  * @param {Express.Request}       req      The request that throwed the error
  * @param {Express.Response}      res      The response that will send the error feedback
@@ -68,7 +62,7 @@ let catcher = (req, res, error) => {
  *
  * @throws {BaseError}
  */
-let thrower = (req, res, error) => {
+const thrower = (req, res, error) => {
   // Case: the response error is not defined
   if (!error)
     error = new GenericInternalServerError({
@@ -92,13 +86,11 @@ let thrower = (req, res, error) => {
  * was given to the user. If the headers were not already sent, then it sends an internal server
  * JSONAPI error as feedback to the response.
  *
- * @since  0.3.0
- *
  * @param {Express.Request}       req      The request that throwed the error
  * @param {Express.Response}      res      The response that will send the error feedback
  * @param {any}                   error    The JSONAPI error to be thrown
  */
-let internal = (req, res, error) => {
+const internal = (req, res, error) => {
   if (res.headersSent) logger.error(error);
   else {
     let internalError = new GenericInternalServerError({
@@ -112,6 +104,8 @@ let internal = (req, res, error) => {
   }
 };
 
-module.exports.catch = catcher;
-module.exports.throw = thrower;
-module.exports.internal = internal;
+module.exports = {
+  catch: catcher,
+  throw: thrower,
+  internal
+};

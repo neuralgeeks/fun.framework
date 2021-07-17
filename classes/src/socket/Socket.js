@@ -30,23 +30,11 @@ const Broadcaster = require('./Broadcaster');
  * The application WebSocket representation
  *
  * Currently only supports socket.io.
- *
- * This class should be final
- *
- * @since      0.1.0
- * @access     public
- *
- * @constructs Socket
  */
 class Socket {
   /**
    * Socket constructor, receives the socket.io server, the application broadcaster
    * and the application event catcher.
-   *
-   * @since      0.1.0
-   * @access     public
-   *
-   * @constructs Socket
    *
    * @param {SocketIO.Server}  io           The application socket.io server.
    * @param {Broadcaster}      broadcaster  The application broadcaster.
@@ -67,30 +55,22 @@ class Socket {
 
   /**
    * Setups the application socket interactions.
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   Socket
    */
   setup() {
     this.io.on('connection', (socket) => {
-      logger.info('Socket ' + socket.id + ' has connected to server');
+      logger.info(`Socket ${socket.id} has connected to server`);
       socket.on('subscribe-client', (data) => {
         this.setupBroadcaster(socket, data);
       });
 
       socket.on('disconnect', () => {
-        logger.info('Socket ' + socket.id + ' has disconnected from server');
+        logger.info(`Socket ${socket.id} has disconnected from server`);
       });
     });
   }
 
   /**
    * Setups the application broadcasting interactions for a given socket.
-   *
-   * @since      0.1.0
-   * @access     private
-   * @memberof   Socket
    *
    * @param      {SocketIO.Socket}   socket  The given socket.
    * @param      {any}               data    The data that the socket sent at its connection.
@@ -105,14 +85,10 @@ class Socket {
       if (canJoin) {
         socket.join(channel.name);
         logger.info(
-          colors.bgBroadcaster +
-            'BROADCASTER' +
-            colors.reset +
-            ' Socket ' +
-            socket.id +
-            ' is joining ' +
-            channel.name +
-            ' channel'
+          [
+            `${colors.bfBroadcaster}BROADCASTER${colors.reset}`,
+            `Socket ${socket.id} is joining ${channel.name} channel`
+          ].join(' ')
         );
       }
     }, this.broadcaster.channels());
