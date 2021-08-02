@@ -17,6 +17,9 @@ const BaseError = require('../../BaseError');
  * limitations under the License.
  */
 
+/**
+ * Standard MissingJWTError representation.
+ */
 class MissingJWTError extends BaseError {
   constructor() {
     let feed = {

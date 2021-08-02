@@ -27,17 +27,17 @@ const errorFun = require('../general/errors.fun');
  * @param {Number}                code     The status to code of the handled response
  *
  * @returns {(data: any, transformFunction: ((input: any) => any),
- *            extra: { meta: any | undefined, links: any | undefined} | undefined) => void}
+ *            extra: { meta: any | undefined, links: any | undefined} = {}) => void}
  *          A function that transforms and send data to the response using the data JSONAPI standard.
  *          The ``transformFunction`` parameter of this function is by default the identity function.
  */
 const data =
   (res, code) =>
-  (data, transformFunction = (item) => item, { meta, links } = {}) => {
+  async (data, transformFunction = (item) => item, { meta, links } = {}) => {
     // validating transform
     if (typeof transformFunction === 'function') {
       // transforming
-      let transformed = transformFunction(data);
+      let transformed = await transformFunction(data);
       let document = {
         data: transformed
       };
@@ -62,6 +62,31 @@ const data =
         })
       );
   };
+
+/**
+ * High order funtion that given an ``Express.Response`` and a status code returns a function
+ * that transforms and send paginated data to the response using the data JSONAPI standard
+ *
+ * @param {Express.Response}      res      The response that will handle the data send
+ * @param {Number}                code     The status to code of the handled response
+ *
+ * @returns {(paginated: {data: any, last: number, next: number | undefined, prev: number | undefined},
+ *            transformFunction: ((input: any) => any),
+ *            extra: { meta: any | undefined, links: any | undefined} = {}) => void}
+ *          A function that transforms and send paginated data to the response using the data JSONAPI standard.
+ *          The ``transformFunction`` parameter of this function is by default the identity function.
+ */
+const pagination =
+  (res, code) =>
+  (
+    { data: pageData, last, next, prev },
+    transformFunction = (item) => item,
+    { meta, links } = {}
+  ) =>
+    data(res, code)(pageData, transformFunction, {
+      meta,
+      links: { ...links, pagination: { first: 1, last, next, prev } }
+    });
 
 /**
  * High order funtion that given an ``Express.Response`` and a status code returns a function
@@ -90,7 +115,7 @@ const meta = (res, code) => (meta) => {
  *              meta: any | undefined,
  *              links: any | undefined,
  *              dataAttr: any | undefined
- *            } | undefined) => void }
+ *            } = {}) => void }
  *          A function that sends a reference to a resource to the response using JSONAPI standard.
  *          The ``dataAttr`` optional attribute of extra gets merged to the data object of the JSONAPI response.
  */
@@ -118,5 +143,6 @@ const reference =
 module.exports = (res, code) => ({
   data: data(res, code),
   meta: meta(res, code),
-  reference: reference(res, code)
+  reference: reference(res, code),
+  pagination: pagination(res, code)
 });

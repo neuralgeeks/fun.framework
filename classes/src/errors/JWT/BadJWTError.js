@@ -17,6 +17,9 @@ const BaseError = require('../../BaseError');
  * limitations under the License.
  */
 
+/**
+ * Standard BadJWTError representation.
+ */
 class BadJWTError extends BaseError {
   constructor(token) {
     let feed = {

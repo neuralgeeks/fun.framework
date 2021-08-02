@@ -17,6 +17,9 @@ const BaseError = require('../BaseError');
  * limitations under the License.
  */
 
+/**
+ * Standard UnauthorizedError representation.
+ */
 class UnauthorizedError extends BaseError {
   constructor(detail) {
     let feed = {

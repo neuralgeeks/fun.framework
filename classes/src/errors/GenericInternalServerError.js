@@ -17,6 +17,9 @@ const BaseError = require('../BaseError');
  * limitations under the License.
  */
 
+/**
+ * GenericInternalServerError representation.
+ */
 class GenericInternalServerError extends BaseError {
   constructor({ meta = {}, detail = 'The server encountered an exception.' }) {
     let feed = {

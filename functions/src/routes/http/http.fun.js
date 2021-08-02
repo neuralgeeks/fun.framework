@@ -43,14 +43,16 @@ const BaseController = require('../../../../classes/src/BaseController');
  * @param {BaseController}   controller   The controller that will handle the http resources.
  *
  * @returns {{
+ *   methods: String[]
  *   post: Method,
  *   get: Method,
  *   put: Method,
  *   patch: Method,
  *   delete: Method
- * }} An object of http methods
+ * }} An object of http methods and the list of available methods
  */
 const http = (router, controller) => ({
+  methods: ['post', 'get', 'put', 'patch', 'delete'],
   post: R.curry(method(router, controller)('post')),
   get: R.curry(method(router, controller)('get')),
   put: R.curry(method(router, controller)('put')),

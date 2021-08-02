@@ -46,7 +46,7 @@ class BaseRepository {
    * @returns {Model[]} A collection of models.
    */
   async all() {
-    return await this.model.findAll();
+    return this.model.findAll();
   }
 
   /**
@@ -57,7 +57,7 @@ class BaseRepository {
    * @returns {Model} A model instance.
    */
   async create(data) {
-    return await this.model.create(data);
+    return this.model.create(data);
   }
 
   /**
@@ -69,7 +69,7 @@ class BaseRepository {
    * @returns {[Number]} A singleton array that holds the number of affected rows.
    */
   async update(id, data) {
-    return await this.model.update(data, { where: { id: id } });
+    return this.model.update(data, { where: { id: id } });
   }
 
   /**
@@ -80,7 +80,7 @@ class BaseRepository {
    * @returns {Number} The number of affected rows.
    */
   async delete(id) {
-    return await this.model.destroy({ where: { id: id } });
+    return this.model.destroy({ where: { id: id } });
   }
 
   /**
@@ -91,7 +91,42 @@ class BaseRepository {
    * @returns {Model} A model instance.
    */
   async show(id) {
-    return await this.model.findOne({ where: { id: id } });
+    return this.model.findOne({ where: { id: id } });
+  }
+
+  /**
+   * Gets a paginated section of the model instances.
+   *
+   * @param {number} perPage The number of instances per page.
+   * @param {number} [currentPage] The current page.
+   * @param {[string, string][]} [order] Sequelize-like order array.
+   *
+   * @returns {{
+   *  data: Model[],
+   *  last: number,
+   *  next: number,
+   *  prev: number
+   * }} The current page data with pagination data.
+   */
+  async paginate(perPage, currentPage = 1, order = [['createdAt', 'ASC']]) {
+    currentPage = Number(currentPage);
+
+    const result = await this.model.findAndCountAll({
+      order,
+      limit: perPage,
+      offset: (currentPage - 1) * perPage
+    });
+
+    const lastPage = Math.ceil(result.count / perPage);
+    const nextPage = currentPage + 1;
+    const prevPage = currentPage - 1;
+
+    return {
+      data: result.rows,
+      last: lastPage,
+      next: (nextPage <= lastPage && nextPage) || undefined,
+      prev: (prevPage > 0 && prevPage) || undefined
+    };
   }
 }
 

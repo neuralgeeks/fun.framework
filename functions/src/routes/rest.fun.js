@@ -42,6 +42,20 @@ const BaseController = require('../../../classes/src/BaseController');
  */
 
 /**
+ * An list of REST route component endpoints, this is, index, store, show, update and destroy
+ * @typedef {('index' | 'store' | 'show' | 'update' | 'destroy')} RestComponent
+ */
+
+/**
+ * A boolean function that returns if a given search is specified in a `RestComponent` array
+ *
+ * @param {RestComponent} search
+ * @param {RestComponent[]} components
+ * @returns {boolean}
+ */
+const project = (search, components) => components.includes(search);
+
+/**
  * Handles the REST routes for a single resource.
  *
  * The REST routes of a resource are treated as a single route (that register many endopoints on the router),
@@ -49,47 +63,55 @@ const BaseController = require('../../../classes/src/BaseController');
  *
  * @param {Express.Router}   router       The router that will handle the REST routes.
  * @param {BaseController}   controller   The controller that handle resources.
- *
- * @returns {(validators: RestValidators) => Route } A high order function that handles the REST routes.
+ *s
+ * @returns {(validators: RestValidators, components: RestComponent[] = ['index', 'store', 'show', 'update', 'destroy']) => Route } A high order function that handles the REST routes.
  */
 const rest =
   (router, controller) =>
-  (restValidators) =>
+  (
+    restValidators,
+    components = ['index', 'store', 'show', 'update', 'destroy']
+  ) =>
   (middlewares = []) => {
     // index - GET
-    http(router, controller).get(
-      '/',
-      'index',
-      new restValidators.index()
-    )(middlewares);
+    project('index', components) &&
+      http(router, controller).get(
+        '/',
+        'index',
+        new restValidators.index()
+      )(middlewares);
 
     // store - POST
-    http(router, controller).post(
-      '/',
-      'store',
-      new restValidators.store()
-    )(middlewares);
+    project('store', components) &&
+      http(router, controller).post(
+        '/',
+        'store',
+        new restValidators.store()
+      )(middlewares);
 
     // show - GET
-    http(router, controller).get(
-      '/:id',
-      'show',
-      new restValidators.show()
-    )(middlewares);
+    project('show', components) &&
+      http(router, controller).get(
+        '/:id',
+        'show',
+        new restValidators.show()
+      )(middlewares);
 
     // update - PUT
-    http(router, controller).put(
-      '/:id',
-      'update',
-      new restValidators.update()
-    )(middlewares);
+    project('update', components) &&
+      http(router, controller).put(
+        '/:id',
+        'update',
+        new restValidators.update()
+      )(middlewares);
 
     // destroy - DELETE
-    http(router, controller).delete(
-      '/:id',
-      'destroy',
-      new restValidators.destroy()
-    )(middlewares);
+    project('destroy', components) &&
+      http(router, controller).delete(
+        '/:id',
+        'destroy',
+        new restValidators.destroy()
+      )(middlewares);
   };
 
 module.exports = rest;

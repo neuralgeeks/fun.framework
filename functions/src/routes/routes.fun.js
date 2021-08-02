@@ -2,10 +2,13 @@ const http = require('./http/http.fun');
 const group = require('./group.fun');
 const subgroup = require('./subgroup.fun');
 const rest = require('./rest.fun');
+const gateway = require('./http/gateway.fun');
 const R = require('ramda');
+const httpProxy = require('http-proxy');
 
 const BaseValidator = require('../../../classes/src/BaseValidator');
 const BaseController = require('../../../classes/src/BaseController');
+const BaseService = require('../../../classes/src/BaseService');
 
 /**
  * @license
@@ -51,8 +54,13 @@ const BaseController = require('../../../classes/src/BaseController');
  */
 
 /**
+ * An list of REST route component endpoints, this is, index, store, show, update and destroy
+ * @typedef {('index' | 'store' | 'show' | 'update' | 'destroy')} RestComponent
+ */
+
+/**
  *  A high order function that handles the REST routes.
- * @typedef {(validators: RestValidators) => Route } Rest
+ * @typedef {(validators: RestValidators, components: RestComponent[] = ['index', 'store', 'show', 'update', 'destroy']) => Route } Rest
  */
 
 /**
@@ -67,12 +75,18 @@ const BaseController = require('../../../classes/src/BaseController');
  */
 
 /**
+ * A fun gateway, product of a evaluation of the fun.gateway high order function in a particular router
+ * @typedef {(options: {proxy: httpProxy, position: number} = {}) => (services: BaseService[]) => (routes: String[]) => (methods: ('post' | 'get' | 'put' | 'patch' | 'delete')[])  => Route} Gateway
+ */
+
+/**
  * Wraps up all fun routes related methods and high order funtions.
  *
  * @param {Express.Router}   router       The router that will handle the routes.
  * @param {BaseController}   controller   The controller that will handle the routes resources.
  *
  * @returns {{
+ *   methods: String[]
  *   post: Method,
  *   get: Method,
  *   put: Method,
@@ -80,7 +94,8 @@ const BaseController = require('../../../classes/src/BaseController');
  *   delete: Method,
  *   group: Group,
  *   subgroup: Group,
- *   rest: Rest
+ *   rest: Rest,
+ *   gateway: Gateway
  * }} Routes related available methods
  */
 const routes = (router, controller) =>
@@ -89,7 +104,8 @@ const routes = (router, controller) =>
     {
       group: group(router, controller),
       subgroup: subgroup(router, controller),
-      rest: rest(router, controller)
+      rest: rest(router, controller),
+      gateway: gateway(router)
     }
   ]);
 

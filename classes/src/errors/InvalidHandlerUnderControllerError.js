@@ -17,6 +17,9 @@ const BaseError = require('../BaseError');
  * limitations under the License.
  */
 
+/**
+ * InvalidHandlerUnderControllerError representation.
+ */
 class InvalidHandlerUnderControllerError extends BaseError {
   constructor(handlerMethodName, controller) {
     let feed = {

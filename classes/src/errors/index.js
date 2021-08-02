@@ -1,5 +1,6 @@
 const JWT = require('./JWT');
 const UnauthorizedError = require('./UnauthorizedError');
+const ForbiddenError = require('./ForbiddenError');
 
 /**
  * @license
@@ -20,5 +21,6 @@ const UnauthorizedError = require('./UnauthorizedError');
 
 module.exports = {
   JWT,
-  UnauthorizedError
+  UnauthorizedError,
+  ForbiddenError
 };

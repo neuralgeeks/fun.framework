@@ -18,6 +18,9 @@ const BaseError = require('../BaseError');
  * limitations under the License.
  */
 
+/**
+ * ExceptionAfterHeadersSentError representation.
+ */
 class ExceptionAfterHeadersSentError extends BaseError {
   constructor(method, meta) {
     let feed = {

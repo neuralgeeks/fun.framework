@@ -1,8 +1,8 @@
-const BaseError = require('../../BaseError');
+const BaseError = require('../BaseError');
 
 /**
  * @license
- * Copyright 2020 neuralgeeks LLC.
+ * Copyright 2021 neuralgeeks LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,15 @@ const BaseError = require('../../BaseError');
  */
 
 /**
- * Standard InvalidJWTError representation.
+ * Standard ForbiddenError representation.
  */
-class InvalidJWTError extends BaseError {
-  constructor(token) {
-    let feed = {
+class ForbiddenError extends BaseError {
+  constructor() {
+    super({
       status: 403,
-      title: 'invalidJWT',
-      detail:
-        'The request cannot be authorized, the given JWT was invalid or has expirated',
-      meta: {
-        givenToken: token
-      }
-    };
-    super(feed);
+      title: 'Forbidden'
+    });
   }
 }
 
-module.exports = InvalidJWTError;
+module.exports = ForbiddenError;

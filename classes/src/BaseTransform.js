@@ -23,10 +23,22 @@ const autoBind = require('auto-bind');
  */
 class BaseTransform {
   /**
-   * BaseTransform constructor
+   * Whether or not this transform is async or not.
+   *
+   * @access private
+   *
+   * @type     {boolean}
    */
-  constructor() {
+  async = false;
+
+  /**
+   * BaseTransform constructor
+   *
+   * @param {{async: boolean }} [options] Transform options.
+   */
+  constructor({ async } = {}) {
     autoBind(this);
+    this.async = async;
   }
 
   /**
@@ -61,7 +73,8 @@ class BaseTransform {
    * @returns    {Object[]}          The morphed collection
    */
   collection(collection) {
-    return R.map((item) => this.morph(item), collection);
+    let out = R.map((item) => this.morph(item), collection);
+    return this.async ? Promise.all(out) : out;
   }
 
   /**
