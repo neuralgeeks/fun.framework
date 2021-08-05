@@ -55,7 +55,10 @@ const serviceErrorHandler = (req, res, service, route) => (error) => {
   // Case: The service returned a non 2XX code
   if (error.response) {
     // Case: Response is not JSONAPI
-    if (!!joi.validate(error.response.data, JSONAPIErrorSchema).error) {
+    if (
+      !!JSONAPIErrorSchema.validate(error.response.data, JSONAPIErrorSchema)
+        .error
+    ) {
       errorFun.throw(
         req,
         res,
