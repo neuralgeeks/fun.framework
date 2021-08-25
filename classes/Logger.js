@@ -71,10 +71,10 @@ class Logger {
    * @param {{debug: Boolean, info: Boolean, error: Boolean}} [level] Whether each logger level is active or not.
    */
   constructor(name, { debug, info, error } = {}) {
-    if (name) Logger.name = name;
-    if (debug) Logger.debug = debug;
-    if (info) Logger.info = info;
-    if (error) Logger.error = error;
+    if (typeof name !== 'undefined') Logger.name = name;
+    if (typeof debug !== 'undefined') Logger.debug = debug;
+    if (typeof info !== 'undefined') Logger.info = info;
+    if (typeof error !== 'undefined') Logger.error = error;
   }
 
   /**
