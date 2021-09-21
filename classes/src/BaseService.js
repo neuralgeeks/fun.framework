@@ -74,6 +74,8 @@ const serviceErrorHandler = (req, res, service, route) => (error) => {
 
     // Case: Response is JSONAPI
     let [JSONAPIErrorFeed] = error.response.data.errors;
+    JSONAPIErrorFeed = JSONAPIErrorFeed || {};
+
     JSONAPIErrorFeed.meta = {
       ...JSONAPIErrorFeed.meta,
       serviceScope: [
