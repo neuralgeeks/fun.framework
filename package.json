@@ -1,6 +1,6 @@
 {
   "name": "fun.framework",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "description": "A fun, intuitive and expressive node.js web application framework based on express.",
   "scripts": {
     "test": "echo \"Test are currently under development 🛠. Please stay tuned for updates ⌚️.\""
