@@ -46,67 +46,74 @@ const JSONAPIErrorSchema = joi.object().keys({
     .required()
 });
 
+const flexibleThrow =
+  (selfHandle = true) =>
+  (req, res, error) => {
+    if (selfHandle && req && res) errorFun.throw(req, res, error);
+    else throw error;
+  };
+
 /**
  * Service custom axios error handler
  */
-const serviceErrorHandler = (req, res, service, route) => (error) => {
-  if (!req || !res) throw error.response || error.request || error.message;
+const flexibleServiceErrorHandler =
+  (req, res, service, route, selfHandle = true) =>
+  (error) => {
+    // Case: The service returned a non 2XX code
+    if (error.response) {
+      // Case: Response is not JSONAPI
+      if (!!JSONAPIErrorSchema.validate(error.response.data).error) {
+        flexibleThrow(selfHandle)(
+          req,
+          res,
+          new BaseError({
+            status: error.response.status,
+            title: 'serviceRequestError',
+            description: `${service} returned an error when calling ${route}`,
+            meta: {
+              originalError: error.response.data,
+              serviceScope: [{ service, route }]
+            }
+          })
+        );
+        return;
+      }
 
-  // Case: The service returned a non 2XX code
-  if (error.response) {
-    // Case: Response is not JSONAPI
-    if (!!JSONAPIErrorSchema.validate(error.response.data).error) {
-      errorFun.throw(
+      // Case: Response is JSONAPI
+      let [JSONAPIErrorFeed] = error.response.data.errors;
+      JSONAPIErrorFeed = JSONAPIErrorFeed || {};
+      JSONAPIErrorFeed.meta = JSONAPIErrorFeed.meta || {};
+
+      JSONAPIErrorFeed.meta = {
+        ...JSONAPIErrorFeed.meta,
+        serviceScope: [
+          ...(JSONAPIErrorFeed.meta.serviceScope || []),
+          { service, route }
+        ]
+      };
+      flexibleThrow(selfHandle)(req, res, new BaseError(JSONAPIErrorFeed));
+    }
+    // Case: The service did not responded
+    else if (error.request)
+      flexibleThrow(selfHandle)(
         req,
         res,
-        new BaseError({
-          status: error.response.status,
-          title: 'serviceRequestError',
-          description: `${service} returned an error when calling ${route}`,
-          meta: {
-            originalError: error.response.data,
-            serviceScope: [{ service, route }]
-          }
+        new GenericInternalServerError({
+          detail: `${service} did not responded at ${route} request.`,
+          meta: { serviceScope: [{ service, route }] }
         })
       );
-      return;
-    }
-
-    // Case: Response is JSONAPI
-    let [JSONAPIErrorFeed] = error.response.data.errors;
-    JSONAPIErrorFeed = JSONAPIErrorFeed || {};
-    JSONAPIErrorFeed.meta = JSONAPIErrorFeed.meta || {};
-
-    JSONAPIErrorFeed.meta = {
-      ...JSONAPIErrorFeed.meta,
-      serviceScope: [
-        ...(JSONAPIErrorFeed.meta.serviceScope || []),
-        { service, route }
-      ]
-    };
-    errorFun.throw(req, res, new BaseError(JSONAPIErrorFeed));
-  }
-  // Case: The service did not responded
-  else if (error.request)
-    errorFun.throw(
-      req,
-      res,
-      new GenericInternalServerError({
-        detail: `${service} did not responded at ${route} request.`,
-        meta: { serviceScope: [{ service, route }] }
-      })
-    );
-  // Case: Unexpected error
-  else
-    errorFun.throw(
-      req,
-      res,
-      new GenericInternalServerError({
-        detail: `Something happened while setting up ${service} ${route} request.`,
-        meta: { serviceScope: [{ service, route }], message: error.message }
-      })
-    );
-};
+    // Case: Unexpected error
+    else
+      flexibleThrow(selfHandle)(
+        req,
+        res,
+        new GenericInternalServerError({
+          detail: `Something happened while setting up ${service} ${route} request.`,
+          meta: { serviceScope: [{ service, route }], message: error.message }
+        })
+      );
+  };
 
 /**
  * Base service representation.
@@ -164,19 +171,28 @@ class BaseService {
    *
    * @access protected
    *
-   * @param      {String}  method     The request request method
-   * @param      {String}  route        The relative route of the request
-   * @param      {any}     [options]  Extra axios options
+   * @param      {String}  method        The request request method
+   * @param      {String}  route         The relative route of the request
+   * @param      {any}     [options]     Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async method(method, route, options) {
+  async method(method, route, options, selfHandle = true) {
     return axios({
       method,
       url: `${this.url}${route}`,
       headers: await this.getHeaders(),
       ...R.omit(['method', 'url'], options)
-    }).catch(serviceErrorHandler(this.req, this.res, this.name, route));
+    }).catch(
+      flexibleServiceErrorHandler(
+        this.req,
+        this.res,
+        this.name,
+        route,
+        selfHandle
+      )
+    );
   }
 
   /**
@@ -185,11 +201,12 @@ class BaseService {
    * @param      {String}  route       The relative route of the request
    * @param      {String}  data        The body data of the request
    * @param      {any}     [options]   Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async post(route, data, options = {}) {
-    return this.method('post', route, { data, ...options });
+  async post(route, data, options = {}, selfHandle = true) {
+    return this.method('post', route, { data, ...options }, selfHandle);
   }
 
   /**
@@ -197,11 +214,12 @@ class BaseService {
    *
    * @param      {String}  route       The relative route of the request
    * @param      {any}     [options]   Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async get(route, options = {}) {
-    return this.method('get', route, options);
+  async get(route, options = {}, selfHandle = true) {
+    return this.method('get', route, options, selfHandle);
   }
 
   /**
@@ -210,11 +228,12 @@ class BaseService {
    * @param      {String}  route       The relative route of the request
    * @param      {any}     data        The body data of the request
    * @param      {any}     [options]   Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async put(route, data, options = {}) {
-    return this.method('put', route, { data, ...options });
+  async put(route, data, options = {}, selfHandle = true) {
+    return this.method('put', route, { data, ...options }, selfHandle);
   }
 
   /**
@@ -223,11 +242,12 @@ class BaseService {
    * @param      {String}  route       The relative route of the request
    * @param      {any}     data        The body data of the request
    * @param      {any}     [options]   Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async patch(route, data, options = {}) {
-    return this.method('patch', route, { data, ...options });
+  async patch(route, data, options = {}, selfHandle = true) {
+    return this.method('patch', route, { data, ...options }, selfHandle);
   }
 
   /**
@@ -236,11 +256,12 @@ class BaseService {
    * @param      {String}  route       The relative route of the request
    * @param      {any}     [data]      The body data of the request
    * @param      {any}     [options]   Extra axios options
+   * @param      {boolean} [selfHandle]  Whether or not the error should self handled or thrown
    *
    * @returns    {axios.AxiosPromise} The request promise
    */
-  async delete(route, data = {}, options = {}) {
-    return this.method('delete', route, { data, ...options });
+  async delete(route, data = {}, options = {}, selfHandle = true) {
+    return this.method('delete', route, { data, ...options }, selfHandle);
   }
 
   /**
