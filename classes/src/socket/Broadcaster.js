@@ -7,6 +7,7 @@ const colors = {
 };
 
 const BaseRule = require('../BaseRule');
+const BaseIdentifier = require('../BaseIdentifier');
 
 /**
  * @license
@@ -50,7 +51,7 @@ class Broadcaster {
   /**
    * Returns the channels configurated for the application broadcaster.
    *
-   * @returns    {{ name: string, rules: BaseRule[] }[]}   The configurated channels for the application.
+   * @returns    {{ name: string, rules: BaseRule[], identifier: BaseIdentifier }[]}   The configurated channels for the application.
    */
   channels() {
     return [];
@@ -73,11 +74,12 @@ class Broadcaster {
    *
    * This method should be final
    *
-   * @param      {string}   to      The name of the channel to broadcast to.
-   * @param      {string}   event   The name of the event to broadcast.
-   * @param      {any}      data    The data of the event.
+   * @param      {string}   to             The name of the channel to broadcast to.
+   * @param      {string}   event          The name of the event to broadcast.
+   * @param      {any}      data           The data of the event.
+   * @param      {string}   [identifier]   The selected client identifier. Default is empty which means every client on the channel.
    */
-  broadcast(to, event, data) {
+  broadcast(to, event, data, identifier = '') {
     if (!Broadcaster.io) {
       logger.error(
         [
@@ -91,14 +93,15 @@ class Broadcaster {
     let exists = R.any((channel) => channel.name === to, this.channels());
 
     if (exists) {
-      Broadcaster.io.to(to).emit(event, data);
+      Broadcaster.io.to(`${to}${identifier}`).emit(event, data);
       logger.info(
         `${colors.bfBroadcaster}BROADCASTER${colors.reset} broadcasted:`
       );
       logger.info({
         channel: to,
-        event: event,
-        data: data
+        event,
+        data,
+        identifier
       });
     } else
       logger.error(

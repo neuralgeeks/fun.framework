@@ -83,11 +83,21 @@ class Socket {
       let canJoin = R.reduce(R.and, true, results);
 
       if (canJoin) {
+        let identity = await channel.identifier.resolveIdentity(data);
+
+        // Joining to broadcast part of the channel
         socket.join(channel.name);
+
+        // Joining to personal part of the channel
+        if (identity !== '') socket.join(`${channel.name}${identity}`);
+
         logger.info(
           [
-            `${colors.bfBroadcaster}BROADCASTER${colors.reset}`,
-            `Socket ${socket.id} is joining ${channel.name} channel`
+            `${colors.bgBroadcaster}BROADCASTER${colors.reset}`,
+            `Socket ${socket.id} is joining ${channel.name} brodcaster channel`,
+            identity !== ''
+              ? `and ${channel.name}${identity} personal channel`
+              : ''
           ].join(' ')
         );
       }

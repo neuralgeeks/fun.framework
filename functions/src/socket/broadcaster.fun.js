@@ -1,4 +1,5 @@
 const BaseRule = require('../../../classes/src/BaseRule');
+const BaseIdentifier = require('../../../classes/src/BaseIdentifier');
 
 /**
  * @license
@@ -20,11 +21,16 @@ const BaseRule = require('../../../classes/src/BaseRule');
 /**
  * Returns the representation of a broadcasting channel
  *
- * @param {string}       name    The channel name.
- * @param {BaseRule[]}   [rules]  The channel subscription rules.
+ * @param {string}           name          The channel name.
+ * @param {BaseRule[]}       [rules]       The channel subscription rules.
+ * @param {BaseIdentifier}   [identifier]  The channel identifier instance. This instance will determine which id is assigned to each client.
  *
- * @returns {{name: string, rules: BaseRule[]} The application arguments.
+ * @returns {{name: string, rules: BaseRule[], identifier: BaseIdentifier} The application arguments.
  */
-const channel = (name, rules = []) => ({ name: name, rules: rules });
+const channel = (name, rules = [], identifier = new BaseIdentifier()) => ({
+  name,
+  rules,
+  identifier
+});
 
 module.exports = { channel };
